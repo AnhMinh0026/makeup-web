@@ -10,6 +10,9 @@ import {
   Sparkles,
   Tag,
   LayoutGrid,
+  CircleDollarSign,
+  Phone,
+  Calendar,
 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -18,6 +21,9 @@ const NAV_LINKS = [
   { href: '/admin/layouts', label: 'Quản lý Ảnh', icon: Images },
   { href: '/admin/categories', label: 'Danh mục', icon: Tag },
   { href: '/admin/layout-display', label: 'Quản lý Blocks', icon: LayoutGrid },
+  { href: '/admin/services', label: 'Quản lý Giá', icon: CircleDollarSign },
+  { href: '/admin/contact-infos', label: 'Quản lý Liên Hệ', icon: Phone },
+  { href: '/admin/schedules', label: 'Lịch bận Studio', icon: Calendar },
   { href: '/admin/settings', label: 'Cài đặt hệ thống', icon: Settings },
 ];
 

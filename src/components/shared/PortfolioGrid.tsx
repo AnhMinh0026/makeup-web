@@ -76,34 +76,52 @@ function ModalOverlay({ children, onClose }: { children: React.ReactNode; onClos
   );
 }
 
+interface ServiceItem {
+  _id: string;
+  name: string;
+  price: string;
+  items: string[];
+  highlight: boolean;
+  order: number;
+}
+
+interface ContactItem {
+  _id: string;
+  icon: string;
+  label: string;
+  value: string;
+  sub?: string;
+  link?: string;
+}
+
+interface ScheduleSlot {
+  _id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  isFullDay: boolean;
+  note?: string;
+}
+
 // ─── Bảng Giá Modal ────────────────────────────────────────────────────────────
 function BangGiaModal({ onClose }: { onClose: () => void }) {
-  const packages = [
-    {
-      name: 'Makeup Cô Dâu',
-      price: 'Từ 2.500.000đ',
-      items: ['Tư vấn & thử makeup trước ngày cưới', 'Makeup cô dâu ngày cưới', 'Chăm sóc & fix makeup cả ngày', 'Bao gồm: làm tóc cô dâu cơ bản'],
-      highlight: true,
-    },
-    {
-      name: 'Makeup Tiệc / Sự Kiện',
-      price: 'Từ 800.000đ',
-      items: ['Makeup dự tiệc sang trọng', 'Phù hợp các buổi lễ, sự kiện', 'Tư vấn phong cách phù hợp'],
-      highlight: false,
-    },
-    {
-      name: 'Makeup Kỷ Yếu',
-      price: 'Từ 650.000đ',
-      items: ['Makeup trẻ trung, rạng rỡ', 'Phong cách tự nhiên hoặc glamour', 'Phù hợp chụp kỷ yếu ngoài trời & phòng'],
-      highlight: false,
-    },
-    {
-      name: 'Makeup Concept / Editorial',
-      price: 'Từ 1.200.000đ',
-      items: ['Makeup nghệ thuật theo concept', 'Phù hợp chụp ảnh nghệ thuật, TVC', 'Trao đổi chi tiết trước buổi chụp'],
-      highlight: false,
-    },
-  ];
+  const [packages, setPackages] = useState<ServiceItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchPackages() {
+      try {
+        const res = await fetch('/api/services');
+        const json = await res.json();
+        if (json.success) setPackages(json.data);
+      } catch {
+        // silent fallback
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPackages();
+  }, []);
 
   return (
     <ModalOverlay onClose={onClose}>
@@ -118,47 +136,57 @@ function BangGiaModal({ onClose }: { onClose: () => void }) {
           Giá tham khảo — liên hệ để nhận báo giá chính xác theo yêu cầu cụ thể.
         </p>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          {packages.map((pkg) => (
-            <div
-              key={pkg.name}
-              style={{
-                border: pkg.highlight ? '1px solid rgba(255,255,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
-                borderRadius: '2px',
-                padding: '1.4rem 1.5rem',
-                background: pkg.highlight ? 'rgba(255,255,255,0.04)' : 'transparent',
-                position: 'relative',
-              }}
-            >
-              {pkg.highlight && (
-                <span style={{
-                  position: 'absolute', top: '-0.6rem', left: '1rem',
-                  background: '#fff', color: '#000',
-                  fontSize: '0.42rem', letterSpacing: '0.2em', textTransform: 'uppercase',
-                  padding: '2px 8px', fontWeight: 700,
-                }}>
-                  PHỔ BIẾN NHẤT
-                </span>
-              )}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.8rem' }}>
-                <h3 style={{ fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff', margin: 0 }}>
-                  {pkg.name}
-                </h3>
-                <span style={{ fontSize: '1rem', fontWeight: 700, color: pkg.highlight ? '#fff' : 'rgba(255,255,255,0.7)', whiteSpace: 'nowrap', marginLeft: '1rem' }}>
-                  {pkg.price}
-                </span>
+        {loading ? (
+          <div style={{ padding: '3rem 0', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>
+            Đang tải bảng giá...
+          </div>
+        ) : packages.length === 0 ? (
+          <div style={{ padding: '3rem 0', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>
+            Chưa có gói dịch vụ nào.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {packages.map((pkg) => (
+              <div
+                key={pkg._id}
+                style={{
+                  border: pkg.highlight ? '1px solid rgba(255,255,255,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                  borderRadius: '2px',
+                  padding: '1.4rem 1.5rem',
+                  background: pkg.highlight ? 'rgba(255,255,255,0.04)' : 'transparent',
+                  position: 'relative',
+                }}
+              >
+                {pkg.highlight && (
+                  <span style={{
+                    position: 'absolute', top: '-0.6rem', left: '1rem',
+                    background: '#fff', color: '#000',
+                    fontSize: '0.42rem', letterSpacing: '0.2em', textTransform: 'uppercase',
+                    padding: '2px 8px', fontWeight: 700,
+                  }}>
+                    PHỔ BIẾN NHẤT
+                  </span>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.8rem' }}>
+                  <h3 style={{ fontSize: '0.78rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#fff', margin: 0 }}>
+                    {pkg.name}
+                  </h3>
+                  <span style={{ fontSize: '1rem', fontWeight: 700, color: pkg.highlight ? '#fff' : 'rgba(255,255,255,0.7)', whiteSpace: 'nowrap', marginLeft: '1rem' }}>
+                    {pkg.price}
+                  </span>
+                </div>
+                <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                  {pkg.items.map((item: string) => (
+                    <li key={item} style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
+                      <span style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0, marginTop: '1px' }}>—</span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
-                {pkg.items.map((item) => (
-                  <li key={item} style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.5)', display: 'flex', gap: '0.5rem', alignItems: 'flex-start' }}>
-                    <span style={{ color: 'rgba(255,255,255,0.25)', flexShrink: 0, marginTop: '1px' }}>—</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <p style={{ marginTop: '1.5rem', fontSize: '0.62rem', color: 'rgba(255,255,255,0.25)', textAlign: 'center', letterSpacing: '0.05em' }}>
           * Giá có thể thay đổi theo địa điểm, thời gian, yêu cầu đặc biệt.
@@ -170,6 +198,24 @@ function BangGiaModal({ onClose }: { onClose: () => void }) {
 
 // ─── Liên Hệ Modal ─────────────────────────────────────────────────────────────
 function LienHeModal({ onClose }: { onClose: () => void }) {
+  const [contacts, setContacts] = useState<ContactItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchContacts() {
+      try {
+        const res = await fetch('/api/contact-infos');
+        const json = await res.json();
+        if (json.success) setContacts(json.data);
+      } catch {
+        // silent fallback
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchContacts();
+  }, []);
+
   return (
     <ModalOverlay onClose={onClose}>
       <div style={{ padding: '2.5rem 2.5rem 2rem' }}>
@@ -180,35 +226,67 @@ function LienHeModal({ onClose }: { onClose: () => void }) {
           Thông Tin Liên Hệ
         </h2>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-          {[
-            { icon: '📱', label: 'Điện thoại / Zalo', value: '0909 xxx xxx', sub: 'Giờ làm việc: 8:00 – 20:00' },
-            { icon: '📘', label: 'Facebook', value: 'Emisa Makeup Artist', sub: 'fb.com/emisamakeup' },
-            { icon: '📸', label: 'Instagram', value: '@emisa.makeup', sub: 'Portfolio đầy đủ tại Instagram' },
-            { icon: '📍', label: 'Studio', value: 'TP. Hồ Chí Minh', sub: 'Hỗ trợ makeup tại nhà & studio' },
-            { icon: '✉️', label: 'Email', value: 'hello@emisamakeup.vn', sub: 'Phản hồi trong vòng 24h' },
-          ].map((item) => (
-            <div key={item.label} style={{
-              display: 'flex', gap: '1.1rem', alignItems: 'flex-start',
-              padding: '1rem 1.2rem',
-              border: '1px solid rgba(255,255,255,0.07)',
-              borderRadius: '2px',
-            }}>
-              <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>{item.icon}</span>
-              <div>
-                <p style={{ fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', margin: '0 0 0.25rem' }}>
-                  {item.label}
-                </p>
-                <p style={{ fontSize: '0.9rem', fontWeight: 600, color: '#fff', margin: '0 0 0.2rem' }}>
-                  {item.value}
-                </p>
-                <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-                  {item.sub}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ padding: '3rem 0', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>
+            Đang tải thông tin liên hệ...
+          </div>
+        ) : contacts.length === 0 ? (
+          <div style={{ padding: '3rem 0', textAlign: 'center', color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>
+            Chưa có thông tin liên hệ.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+            {contacts.map((item) => {
+              const cardContent = (
+                <div style={{
+                  display: 'flex', gap: '1.1rem', alignItems: 'flex-start',
+                  padding: '1rem 1.2rem',
+                  border: '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: '2px',
+                  width: '100%',
+                  textAlign: 'left',
+                }}>
+                  <span style={{ fontSize: '1.3rem', flexShrink: 0 }}>{item.icon}</span>
+                  <div>
+                    <p style={{ fontSize: '0.52rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', margin: '0 0 0.25rem' }}>
+                      {item.label}
+                    </p>
+                    <p style={{ fontSize: '0.9rem', fontWeight: 600, color: '#fff', margin: '0 0 0.2rem' }}>
+                      {item.value}
+                    </p>
+                    {item.sub && (
+                      <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+                        {item.sub}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+
+              if (item.link) {
+                return (
+                  <a
+                    key={item._id}
+                    href={item.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ textDecoration: 'none', display: 'block', transition: 'opacity 0.2s' }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                  >
+                    {cardContent}
+                  </a>
+                );
+              }
+
+              return (
+                <div key={item._id}>
+                  {cardContent}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         <div style={{ marginTop: '1.8rem', padding: '1rem 1.2rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '2px', textAlign: 'center' }}>
           <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', letterSpacing: '0.04em', margin: 0 }}>
@@ -225,10 +303,59 @@ function XemLichModal({ onClose }: { onClose: () => void }) {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
+  const [slots, setSlots] = useState<ScheduleSlot[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Demo: random booked days
-  const bookedDays = new Set([3, 7, 8, 14, 15, 21, 22, 28]);
-  const partialDays = new Set([5, 12, 19, 25]);
+  // Today in Vietnam timezone YYYY-MM-DD
+  const todayVNStr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Ho_Chi_Minh' }).format(new Date());
+  const [selectedDateStr, setSelectedDateStr] = useState<string | null>(todayVNStr);
+
+  useEffect(() => {
+    async function fetchSchedules() {
+      try {
+        const res = await fetch('/api/schedules');
+        const json = await res.json();
+        if (json.success) setSlots(json.data);
+      } catch {
+        // silent fallback
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSchedules();
+  }, []);
+
+  const bookedDays = new Set<number>();
+  const partialDays = new Set<number>();
+  const notesMap = new Map<number, string[]>();
+
+  slots.forEach((s) => {
+    const parts = s.date.split('-');
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const d = parseInt(parts[2], 10);
+
+    if (y === currentYear && m === currentMonth) {
+      if (s.isFullDay) {
+        bookedDays.add(d);
+      } else {
+        partialDays.add(d);
+      }
+      
+      const timeStr = s.isFullDay ? 'Cả ngày' : `${s.startTime || '00:00'} - ${s.endTime || '23:59'}`;
+      const desc = `${timeStr}${s.note ? ` (${s.note})` : ''}`;
+      const list = notesMap.get(d) || [];
+      list.push(desc);
+      notesMap.set(d, list);
+    }
+  });
+
+  // Ensure bookedDays takes precedence over partialDays if both exist on a day
+  partialDays.forEach((d) => {
+    if (bookedDays.has(d)) {
+      partialDays.delete(d);
+    }
+  });
 
   const monthNames = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
     'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
@@ -277,57 +404,196 @@ function XemLichModal({ onClose }: { onClose: () => void }) {
           >›</button>
         </div>
 
-        {/* Day headers */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '4px' }}>
-          {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(d => (
-            <div key={d} style={{ textAlign: 'center', fontSize: '0.52rem', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.25)', padding: '0.3rem 0', textTransform: 'uppercase' }}>{d}</div>
-          ))}
-        </div>
+        {loading ? (
+          <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.35)', fontSize: '0.75rem' }}>
+            Đang tải lịch bận...
+          </div>
+        ) : (
+          <>
+            {/* Day headers */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '4px' }}>
+              {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(d => (
+                <div key={d} style={{ textAlign: 'center', fontSize: '0.52rem', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.25)', padding: '0.3rem 0', textTransform: 'uppercase' }}>{d}</div>
+              ))}
+            </div>
 
-        {/* Calendar grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
-          {cells.map((day, i) => {
-            if (!day) return <div key={`e-${i}`} />;
-            const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
-            const isBooked = bookedDays.has(day);
-            const isPartial = partialDays.has(day);
-            const isPast = new Date(currentYear, currentMonth, day) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            {/* Calendar grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px' }}>
+              {cells.map((day, i) => {
+                if (!day) return <div key={`e-${i}`} />;
+                const formattedMonth = String(currentMonth + 1).padStart(2, '0');
+                const formattedDay = String(day).padStart(2, '0');
+                const dateStr = `${currentYear}-${formattedMonth}-${formattedDay}`;
+                const isSelected = selectedDateStr === dateStr;
+                
+                const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+                const isBooked = bookedDays.has(day);
+                const isPartial = partialDays.has(day);
+                const isPast = dateStr < todayVNStr;
+                
+                const noteLines = notesMap.get(day);
+                const noteText = noteLines
+                  ? `Lịch bận ngày ${day}:\n${noteLines.map(n => `• ${n}`).join('\n')}`
+                  : undefined;
 
-            let bg = 'transparent';
-            let border = '1px solid rgba(255,255,255,0.07)';
-            let color = 'rgba(255,255,255,0.75)';
-            let dotColor = '#4ade80';
+                let bg = 'transparent';
+                let border = '1px solid rgba(255,255,255,0.07)';
+                let color = 'rgba(255,255,255,0.75)';
+                let dotColor = '#4ade80';
 
-            if (isPast) { color = 'rgba(255,255,255,0.18)'; dotColor = 'transparent'; }
-            else if (isBooked) { bg = 'rgba(239,68,68,0.08)'; border = '1px solid rgba(239,68,68,0.2)'; color = 'rgba(255,255,255,0.3)'; dotColor = '#ef4444'; }
-            else if (isPartial) { bg = 'rgba(251,191,36,0.06)'; border = '1px solid rgba(251,191,36,0.18)'; dotColor = '#fbbf24'; }
-            else { dotColor = '#4ade80'; }
+                if (isPast) { color = 'rgba(255,255,255,0.18)'; dotColor = 'transparent'; }
+                else if (isBooked) { bg = 'rgba(239,68,68,0.08)'; border = '1px solid rgba(239,68,68,0.2)'; color = 'rgba(255,255,255,0.3)'; dotColor = '#ef4444'; }
+                else if (isPartial) { bg = 'rgba(251,191,36,0.06)'; border = '1px solid rgba(251,191,36,0.18)'; dotColor = '#fbbf24'; }
+                else { dotColor = '#4ade80'; }
 
-            if (isToday) { border = '1px solid rgba(255,255,255,0.6)'; }
+                if (isSelected) {
+                  border = '1px solid #fff';
+                } else if (isToday) {
+                  border = '1px dashed rgba(255,255,255,0.6)';
+                }
 
-            return (
-              <div key={day} style={{
-                padding: '0.55rem 0.3rem 0.4rem',
-                background: bg, border, borderRadius: '2px',
-                textAlign: 'center', position: 'relative',
-                cursor: isBooked || isPast ? 'default' : 'pointer',
-                transition: 'all 0.15s',
-              }}
-                onMouseEnter={e => { if (!isBooked && !isPast) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = bg; }}
+                return (
+                  <div key={day}
+                    onClick={() => {
+                      if (!isPast) {
+                        setSelectedDateStr(dateStr);
+                      }
+                    }}
+                    style={{
+                      padding: '0.55rem 0.3rem 0.4rem',
+                      background: bg, border, borderRadius: '2px',
+                      textAlign: 'center', position: 'relative',
+                      cursor: isPast ? 'default' : 'pointer',
+                      transition: 'all 0.15s',
+                    }}
+                    title={noteText}
+                    onMouseEnter={e => { if (!isPast) e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = bg; }}
+                  >
+                    <span style={{ fontSize: '0.72rem', color, fontWeight: (isToday || isSelected) ? 700 : 400 }}>{day}</span>
+                    {!isPast && <div style={{ width: 4, height: 4, borderRadius: '50%', background: dotColor, margin: '3px auto 0', opacity: 0.8 }} />}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Selected Date Details Panel */}
+            {selectedDateStr && (
+              <div
+                style={{
+                  marginTop: '1.2rem',
+                  padding: '1rem 1.1rem',
+                  background: 'rgba(255,255,255,0.02)',
+                  border: '1px solid rgba(255,255,255,0.06)',
+                  borderRadius: '4px',
+                  textAlign: 'left',
+                }}
               >
-                <span style={{ fontSize: '0.72rem', color, fontWeight: isToday ? 700 : 400 }}>{day}</span>
-                {!isPast && <div style={{ width: 4, height: 4, borderRadius: '50%', background: dotColor, margin: '3px auto 0', opacity: 0.8 }} />}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 600, color: '#fff', letterSpacing: '0.02em' }}>
+                    Chi tiết ngày {selectedDateStr.split('-')[2]}/{selectedDateStr.split('-')[1]}/{selectedDateStr.split('-')[0]}
+                  </span>
+                  
+                  {(() => {
+                    const daySlots = slots.filter(s => s.date === selectedDateStr);
+                    const hasFullDay = daySlots.some(s => s.isFullDay);
+                    const isPast = selectedDateStr < todayVNStr;
+                    
+                    if (isPast) {
+                      return (
+                        <span style={{ fontSize: '0.6rem', color: 'rgba(255,255,255,0.3)', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '2px' }}>
+                          Đã qua
+                        </span>
+                      );
+                    } else if (hasFullDay) {
+                      return (
+                        <span style={{ fontSize: '0.6rem', color: '#ef4444', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.2)', padding: '2px 6px', borderRadius: '2px', fontWeight: 600 }}>
+                          Đã kín lịch
+                        </span>
+                      );
+                    } else if (daySlots.length > 0) {
+                      return (
+                        <span style={{ fontSize: '0.6rem', color: '#fbbf24', background: 'rgba(251,191,36,0.1)', border: '1px solid rgba(251,191,36,0.18)', padding: '2px 6px', borderRadius: '2px', fontWeight: 600 }}>
+                          Bận theo giờ
+                        </span>
+                      );
+                    } else {
+                      return (
+                        <span style={{ fontSize: '0.6rem', color: '#4ade80', background: 'rgba(74,222,128,0.1)', border: '1px solid rgba(74,222,128,0.18)', padding: '2px 6px', borderRadius: '2px', fontWeight: 600 }}>
+                          Còn trống
+                        </span>
+                      );
+                    }
+                  })()}
+                </div>
+
+                {(() => {
+                  const daySlots = slots.filter(s => s.date === selectedDateStr);
+                  const isPast = selectedDateStr < todayVNStr;
+
+                  if (isPast) {
+                    return (
+                      <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.25)', margin: 0 }}>
+                        Ngày này đã trôi qua. Vui lòng chọn ngày ở hiện tại hoặc tương lai.
+                      </p>
+                    );
+                  }
+
+                  if (daySlots.length === 0) {
+                    return (
+                      <p style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.45)', margin: 0, lineHeight: 1.5 }}>
+                        Ngày này hiện đang <strong style={{ color: '#4ade80' }}>trống lịch hoàn toàn</strong>. Bạn có thể thoải mái liên hệ đặt lịch bất kỳ khung giờ nào!
+                      </p>
+                    );
+                  }
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                      <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', margin: '0 0 0.15rem' }}>
+                        Các khung giờ đã bận:
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                        {daySlots.map((s, idx) => (
+                          <div
+                            key={s._id || idx}
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '0.5rem',
+                              background: 'rgba(255,255,255,0.015)',
+                              border: '1px solid rgba(255,255,255,0.04)',
+                              borderRadius: '3px',
+                              padding: '0.4rem 0.6rem',
+                            }}
+                          >
+                            <div style={{ width: 4, height: 4, borderRadius: '50%', background: s.isFullDay ? '#ef4444' : '#fbbf24' }} />
+                            <span style={{ fontSize: '0.68rem', color: '#fff', fontWeight: 600, minWidth: '85px' }}>
+                              {s.isFullDay ? 'Cả ngày' : `${s.startTime || '00:00'} - ${s.endTime || '23:59'}`}
+                            </span>
+                            {s.note && (
+                              <span style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.3)', borderLeft: '1px solid rgba(255,255,255,0.08)', paddingLeft: '0.5rem' }}>
+                                {s.note}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                      <p style={{ fontSize: '0.65rem', color: 'rgba(74,222,128,0.7)', margin: '0.3rem 0 0', lineHeight: 1.4 }}>
+                        ✓ Bạn vẫn có thể đặt lịch các khung giờ khác còn trống trong ngày.
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
-            );
-          })}
-        </div>
+            )}
+          </>
+        )}
 
         {/* Legend */}
         <div style={{ display: 'flex', gap: '1.2rem', marginTop: '1.5rem', flexWrap: 'wrap' }}>
           {[
             { dot: '#4ade80', label: 'Còn trống' },
-            { dot: '#fbbf24', label: 'Còn 1 slot' },
+            { dot: '#fbbf24', label: 'Bận theo giờ' },
             { dot: '#ef4444', label: 'Đã kín lịch' },
           ].map(l => (
             <div key={l.label} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>

@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div
+      className="admin-layout-root"
       style={{
         display: 'flex',
         minHeight: '100vh',
@@ -20,6 +21,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         fontFamily: 'var(--font-geist-sans), Inter, sans-serif',
       }}
     >
+      <style dangerouslySetInnerHTML={{ __html: `
+        .admin-layout-root h1,
+        .admin-layout-root h2,
+        .admin-layout-root h3,
+        .admin-layout-root h4,
+        .admin-layout-root h5,
+        .admin-layout-root h6,
+        .admin-layout-root input,
+        .admin-layout-root button,
+        .admin-layout-root select,
+        .admin-layout-root textarea {
+          font-family: var(--font-geist-sans), Inter, sans-serif;
+        }
+      `}} />
       <AdminSidebar />
 
       {/* ── Main content area ── */}
