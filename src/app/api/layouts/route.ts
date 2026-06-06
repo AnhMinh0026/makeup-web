@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     const category = sp.get('category');
     const page = Math.max(1, parseInt(sp.get('page') ?? '1', 10));
     const limit = Math.min(200, Math.max(1, parseInt(sp.get('limit') ?? '20', 10)));
-    const sortBy = sp.get('sortBy') === 'order' ? { order: 1 as const } : { createdAt: -1 as const };
+    const sortBy: any = sp.get('sortBy') === 'order' ? { order: 1 } : { createdAt: -1 };
 
     // Build filter
     const filter: { category?: string } = {};

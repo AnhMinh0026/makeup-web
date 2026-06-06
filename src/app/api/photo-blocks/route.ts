@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
-import PhotoBlock from '@/models/PhotoBlock';
+import PhotoBlock, { BlockLayoutType } from '@/models/PhotoBlock';
 import Layout from '@/models/Layout';
 import mongoose from 'mongoose';
 
@@ -100,12 +100,12 @@ export async function POST(request: NextRequest) {
 
     const newBlock = await PhotoBlock.create({
       photos: objectIds,
-      layoutType,
+      layoutType: layoutType as BlockLayoutType,
       order: nextOrder,
     });
 
     // Populate the new block before returning
-    const populated = await PhotoBlock.findById(newBlock._id).populate('photos').lean();
+    const populated = await PhotoBlock.findById((newBlock as any)._id).populate('photos').lean();
 
     return NextResponse.json({ success: true, data: populated }, { status: 201 });
   } catch (error) {
