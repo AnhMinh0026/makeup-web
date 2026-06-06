@@ -240,7 +240,6 @@ export default async function DashboardPage() {
     <div
       style={{
         padding: '2rem 2.25rem',
-        maxWidth: '1100px',
       }}
     >
       <style dangerouslySetInnerHTML={{ __html: dashboardStyles }} />

@@ -1,16 +1,13 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
-import { LayoutCategory, LAYOUT_CATEGORIES } from '@/lib/categories';
-
-export type { LayoutCategory };
-export { LAYOUT_CATEGORIES };
 
 export interface ILayout extends Document {
   title: string;
   description?: string;
-  category: LayoutCategory;
+  category: string;
   imageUrl: string;
   featured: boolean;
   fileSize: number;
+  order: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -28,10 +25,6 @@ const LayoutSchema: Schema<ILayout> = new Schema(
     },
     category: {
       type: String,
-      enum: {
-        values: LAYOUT_CATEGORIES,
-        message: '{VALUE} is not a valid category',
-      },
       default: 'MAKEUP CONCEPT',
     },
     imageUrl: {
@@ -45,6 +38,11 @@ const LayoutSchema: Schema<ILayout> = new Schema(
     fileSize: {
       type: Number,
       default: 0,
+    },
+    order: {
+      type: Number,
+      required: true,
+      unique: true,
     },
   },
   {

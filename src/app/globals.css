@@ -134,3 +134,30 @@
     font-family: var(--font-playfair), Georgia, serif;
   }
 }
+
+/* ── Portfolio Grid & Sticky Header ──────────────────────────────────────── */
+
+/* Grid layouts — shared */
+.pg-block-row,
+.pg-legacy-grid {
+  display: grid;
+  gap: 6px;
+}
+.pg-block-row.cols-1,
+.pg-legacy-grid.cols-1 { grid-template-columns: 1fr; }
+.pg-block-row.cols-2,
+.pg-legacy-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.pg-block-row.cols-3,
+.pg-legacy-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+
+/* Sticky header — mobile ONLY (≤768px) */
+@media (max-width: 768px) {
+  .pg-sticky-header {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: #000;
+    isolation: isolate;
+  }
+}

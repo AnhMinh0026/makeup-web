@@ -225,14 +225,16 @@ export default function ImageLightbox({ src, alt, onClose }: ImageLightboxProps)
               bottom: '1.4rem',
               left: '50%',
               transform: 'translateX(-50%)',
-              color: 'rgba(255,255,255,0.2)',
+              color: 'rgba(255, 255, 255, 1)',
               fontSize: '0.55rem',
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
+              textAlign: 'center',
+              whiteSpace: 'nowrap',
               pointerEvents: 'none',
             }}
           >
-            Scroll hoặc nhấn + / − để zoom · ESC để đóng
+            Scroll hoặc nhấn + / − để zoom
           </motion.p>
         )}
       </motion.div>

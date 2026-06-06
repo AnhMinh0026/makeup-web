@@ -1,18 +1,8 @@
 /**
- * Shared constants that are safe to import in both Server and Client Components.
- * Do NOT import mongoose/db here.
+ * categories.ts — Shared type helpers.
+ * Category data is now stored in MongoDB (collection: categories).
+ * Use /api/categories to fetch the dynamic list.
  */
-export type LayoutCategory =
-  | 'MAKEUP CÔ DÂU'
-  | 'MAKEUP TIỆC'
-  | 'MAKEUP KỶ YẾU'
-  | 'MAKEUP SỰ KIỆN'
-  | 'MAKEUP CONCEPT';
 
-export const LAYOUT_CATEGORIES: LayoutCategory[] = [
-  'MAKEUP CÔ DÂU',
-  'MAKEUP TIỆC',
-  'MAKEUP KỶ YẾU',
-  'MAKEUP SỰ KIỆN',
-  'MAKEUP CONCEPT',
-];
+/** Generic string alias for a category name coming from the DB */
+export type LayoutCategory = string;

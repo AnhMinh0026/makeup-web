@@ -1,4 +1,6 @@
 import PortfolioGrid from '@/components/shared/PortfolioGrid';
+import CinematicIntro from '@/components/shared/CinematicIntro';
+import ScrollToTop from '@/components/shared/ScrollToTop';
 
 export const metadata = {
   title: 'EMISA MAKEUP — Portfolio',
@@ -7,7 +9,9 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <main className="bg-black min-h-screen overflow-x-hidden flex flex-col">
+    <main className="bg-black min-h-screen flex flex-col" style={{ overflowX: 'clip' }}>
+      <CinematicIntro />
+      <ScrollToTop />
       <PortfolioGrid />
       <footer style={{
         textAlign: 'center',

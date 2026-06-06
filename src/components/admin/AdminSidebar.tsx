@@ -8,12 +8,16 @@ import {
   Settings,
   LogOut,
   Sparkles,
+  Tag,
+  LayoutGrid,
 } from 'lucide-react';
 import { useState } from 'react';
 
 const NAV_LINKS = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/layouts', label: 'Quản lý Layouts', icon: Images },
+  { href: '/admin/layouts', label: 'Quản lý Ảnh', icon: Images },
+  { href: '/admin/categories', label: 'Danh mục', icon: Tag },
+  { href: '/admin/layout-display', label: 'Quản lý Blocks', icon: LayoutGrid },
   { href: '/admin/settings', label: 'Cài đặt hệ thống', icon: Settings },
 ];
 

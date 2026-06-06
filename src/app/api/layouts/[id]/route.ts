@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db';
-import Layout, { LAYOUT_CATEGORIES, LayoutCategory } from '@/models/Layout';
+import Layout from '@/models/Layout';
+import Category from '@/models/Category';
 import mongoose from 'mongoose';
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -59,11 +60,14 @@ export async function PUT(req: NextRequest, ctx: RouteContext) {
       );
     }
 
-    if (category && !LAYOUT_CATEGORIES.includes(category as LayoutCategory)) {
-      return NextResponse.json(
-        { success: false, error: 'Danh mục không hợp lệ.' },
-        { status: 400 }
-      );
+    if (category) {
+      const catExists = await Category.findOne({ name: category }).lean();
+      if (!catExists) {
+        return NextResponse.json(
+          { success: false, error: 'Danh mục không hợp lệ.' },
+          { status: 400 }
+        );
+      }
     }
 
     const updated = await Layout.findByIdAndUpdate(
